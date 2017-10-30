@@ -1,4 +1,4 @@
-@echo off& call lib\load.bat _strlen2 _getLF _isOddNum& call lib\loadE.bat CurS& setlocal enabledelayedexpansion
+@echo off& call load.bat _strlen2 _getLF _isOddNum& call loadE.bat CurS& setlocal enabledelayedexpansion
 %CurS% /crv 0
 ::表格
 ::    %1 数据文件
