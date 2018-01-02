@@ -1,28 +1,46 @@
-@echo off& call load.bat _strlen2 _getLF _isOddNum& call loadE.bat CurS& setlocal enabledelayedexpansion
+@echo off& call load.bat _strlen2 _getLF _isOddNum& call loadF.bat _params& call loadE.bat CurS& setlocal enabledelayedexpansion
 %CurS% /crv 0
-::表格
-::    %1 数据文件
-::    %2 表格左右空白宽度
-::    TODO 基于object方格的创建表格版本
-::        call table.bat new table
-::        %table.setAlignStyle% left
-::        %table.add(1,2,3)%
-::        %table.draw%;
-set dataFile=%~1
-set linePrefixLen=%2
-::[left middle right]
-set alignStyle=left
-::[┌┬┐├┼┤└┴┘  ┏┳┓┣╋┫┗┻┛  ╔╦╗╠╬╣╚╩╝ ┼┼┼├┼┤┼┼┼ ···├┼┤··· ·········]
+::说明
+::  绘制表格
+::参数
+::  [-b borderStyle] [-a alignStyle] [-l linePrefixLen] dataFile
+::      borderStyle - 表格样式(1[┌┬┐├┼┤└┴┘]  2[┏┳┓┣╋┫┗┻┛] 3[╔╦╗╠╬╣╚╩╝] 4[┼┼┼├┼┤┼┼┼] 5[···├┼┤···] 6[·········]), 默认为·········
+::      alignStyle - 表格对齐方式[left middle right], 默认为middle
+::      linePrefixLen - 绘制的表格左右空白宽度, 默认为10
+::      dataFile - 传入数据文件地址,为空时,展示demo数据
+::TODO
+::  基于object方格的创建表格版本
+::    call table.bat new table
+::    %table.setAlignStyle% left
+::    %table.add(1,2,3)%
+::    %table.draw%;
+
+::========================= set default param =========================
+set dataFile=data/data.txt
 set borderStyle=·········
+set alignStyle=middle
+set linePrefixLen=10
+call %_params% %*
 
 
+::========================= set user param =========================
+if defined _param-b (
+    set borderStyle=%_param-b%& set flag=0
+    if "!borderStyle!"=="1" set flag=1& set borderStyle=┌┬┐├┼┤└┴┘
+	if "!borderStyle!"=="2" set flag=1& set borderStyle=┏┳┓┣╋┫┗┻┛
+	if "!borderStyle!"=="3" set flag=1& set borderStyle=╔╦╗╠╬╣╚╩╝
+	if "!borderStyle!"=="4" set flag=1& set borderStyle=┼┼┼├┼┤┼┼┼
+	if "!borderStyle!"=="5" set flag=1& set borderStyle=···├┼┤···
+	if "!borderStyle!"=="6" set flag=1& set borderStyle=·········
+	if !flag!==0 call :errorMsg "-b=!borderStyle! MUST BE AN INTEGER BETWEEN 1 AND 6"
+)
+if defined _param-a (set alignStyle=%_param-a%)
+if defined _param-l (set linePrefixLen=%_param-l%)
+if defined _param-0 (set dataFile=%_param-0%)
+if not exist "!dataFile!" call :errorMsg "!dataFile! FILE NOT EXIST"
 
-if "!dataFile!" EQU "" set dataFile=data/data.txt
-if "!linePrefixLen!" EQU "" set linePrefixLen=10
 
-
-
-::read data
+::========================= read data =========================
 set vIndex=1
 for /f "delims=" %%x in (!dataFile!) do (
 	set lineStr=%%x& set hIndex=1
@@ -45,7 +63,7 @@ for /f "delims=" %%x in (!dataFile!) do (
 set /a hMax=hIndex-1, vMax=vIndex-1
 
 
-::init
+::========================= init =========================
 set borderStyle.11=!borderStyle:~0,1!& set borderStyle.21=!borderStyle:~1,1!& set borderStyle.31=!borderStyle:~2,1!
 set borderStyle.12=!borderStyle:~3,1!& set borderStyle.22=!borderStyle:~4,1!& set borderStyle.32=!borderStyle:~5,1!
 set borderStyle.13=!borderStyle:~6,1!& set borderStyle.23=!borderStyle:~7,1!& set borderStyle.33=!borderStyle:~8,1!
@@ -61,7 +79,7 @@ for /l %%h in (1,1,!hMax!) do (
 mode !screenWidth!,!screenHeight!
 
 
-::draw
+::========================= draw =========================
 title 表格:!dataFile!
 ::第一行边框
 set "drawStr=!LF!!LF!!linePrefixBlank!!borderStyle.11!"
@@ -109,3 +127,11 @@ for /l %%v in (1,1,!vMax!) do (
 	)
 )
 echo !drawStr!& pause>nul& goto :EOF
+
+
+
+
+
+
+:errorMsg
+echo errorMsg:& echo     %~1& pause>nul& exit
