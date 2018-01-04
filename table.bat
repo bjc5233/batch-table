@@ -1,4 +1,4 @@
-@echo off& call load.bat _strlen2 _getLF _isOddNum& call loadF.bat _params& call loadE.bat CurS& setlocal enabledelayedexpansion
+@echo off& call load.bat _strlen2 _getLF _isOddNum& call loadF.bat _params _errorMsg& call loadE.bat CurS& setlocal enabledelayedexpansion
 %CurS% /crv 0
 ::说明
 ::  绘制表格
@@ -32,12 +32,13 @@ if defined _param-b (
 	if "!borderStyle!"=="4" set flag=1& set borderStyle=┼┼┼├┼┤┼┼┼
 	if "!borderStyle!"=="5" set flag=1& set borderStyle=···├┼┤···
 	if "!borderStyle!"=="6" set flag=1& set borderStyle=·········
-	if !flag!==0 call :errorMsg "-b=!borderStyle! MUST BE AN INTEGER BETWEEN 1 AND 6"
+	if !flag!==0 (call %_errorMsg% %0 "-b=!borderStyle! MUST BE AN INTEGER BETWEEN 1 AND 6")
+    
 )
 if defined _param-a (set alignStyle=%_param-a%)
 if defined _param-l (set linePrefixLen=%_param-l%)
 if defined _param-0 (set dataFile=%_param-0%)
-if not exist "!dataFile!" call :errorMsg "!dataFile! FILE NOT EXIST"
+if not exist "!dataFile!" (call %_errorMsg% %0 "!dataFile! FILE NOT EXIST")
 
 
 ::========================= read data =========================
@@ -127,11 +128,3 @@ for /l %%v in (1,1,!vMax!) do (
 	)
 )
 echo !drawStr!& pause>nul& goto :EOF
-
-
-
-
-
-
-:errorMsg
-echo errorMsg:& echo     %~1& pause>nul& exit
