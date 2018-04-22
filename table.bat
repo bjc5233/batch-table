@@ -1,19 +1,21 @@
-@echo off& call load.bat _strlen2 _getLF _isOddNum& call loadF.bat _params _errorMsg& call loadE.bat CurS& setlocal enabledelayedexpansion
+@echo off& call load.bat _strlen2 _getLF _isOddNum& call loadF.bat _params _errorMsg _help& call loadE.bat CurS& setlocal enabledelayedexpansion
 %CurS% /crv 0
-::说明
-::  绘制表格
-::参数
-::  [-b borderStyle] [-a alignStyle] [-l linePrefixLen] dataFile
-::      borderStyle - 表格样式(1[┌┬┐├┼┤└┴┘]  2[┏┳┓┣╋┫┗┻┛] 3[╔╦╗╠╬╣╚╩╝] 4[┼┼┼├┼┤┼┼┼] 5[···├┼┤···] 6[·········]), 默认为·········
-::      alignStyle - 表格对齐方式[left middle right], 默认为middle
-::      linePrefixLen - 绘制的表格左右空白宽度, 默认为10
-::      dataFile - 传入数据文件地址,为空时,展示demo数据
-::TODO
-::  基于object方格的创建表格版本
-::    call table.bat new table
-::    %table.setAlignStyle% left
-::    %table.add(1,2,3)%
-::    %table.draw%;
+:::说明
+:::  绘制表格
+:::参数
+:::  [-b borderStyle] [-a alignStyle] [-l linePrefixLen] dataFile
+:::      borderStyle - 表格样式(1[┌┬┐├┼┤└┴┘]  2[┏┳┓┣╋┫┗┻┛] 3[╔╦╗╠╬╣╚╩╝] 4[┼┼┼├┼┤┼┼┼] 5[···├┼┤···] 6[·········]), 默认为·········
+:::      alignStyle - 表格对齐方式[left middle right], 默认为middle
+:::      linePrefixLen - 绘制的表格左右空白宽度, 默认为10
+:::      dataFile - 传入数据文件地址,为空时,展示demo数据
+:::  [-h help]
+:::      help - 打印注释信息
+:::TODO
+:::  基于object方格的创建表格版本
+:::    call table.bat new table
+:::    %table.setAlignStyle% left
+:::    %table.add(1,2,3)%
+:::    %table.draw%;
 
 ::========================= set default param =========================
 set dataFile=data/data.txt
@@ -24,6 +26,8 @@ call %_params% %*
 
 
 ::========================= set user param =========================
+if defined _param-h (call %_help% "%~f0"& goto :EOF)
+if defined _param-help (call %_help% "%~f0"& goto :EOF)
 if defined _param-b (
     set borderStyle=%_param-b%& set flag=0
     if "!borderStyle!"=="1" set flag=1& set borderStyle=┌┬┐├┼┤└┴┘
