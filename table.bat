@@ -1,4 +1,4 @@
-@echo off& call load.bat _strlen2 _getLF _isOddNum& call loadF.bat _params _errorMsg _help& call loadE.bat CurS& setlocal enabledelayedexpansion
+@echo off& call load.bat _strlen2 _getLF _isOddNum _getRandomNum& call loadF.bat _params _errorMsg _help& call loadE.bat CurS& setlocal enabledelayedexpansion
 %CurS% /crv 0
 :::说明
 :::  绘制表格
@@ -19,7 +19,6 @@
 
 ::========================= set default param =========================
 set dataFile=data/data.txt
-set borderStyle=·········
 set alignStyle=middle
 set linePrefixLen=10
 call %_params% %*
@@ -29,21 +28,23 @@ call %_params% %*
 if defined _param-h (call %_help% "%~f0"& goto :EOF)
 if defined _param-help (call %_help% "%~f0"& goto :EOF)
 if defined _param-b (
-    set borderStyle=%_param-b%& set flag=0
-    if "!borderStyle!"=="1" set flag=1& set borderStyle=┌┬┐├┼┤└┴┘
-	if "!borderStyle!"=="2" set flag=1& set borderStyle=┏┳┓┣╋┫┗┻┛
-	if "!borderStyle!"=="3" set flag=1& set borderStyle=╔╦╗╠╬╣╚╩╝
-	if "!borderStyle!"=="4" set flag=1& set borderStyle=┼┼┼├┼┤┼┼┼
-	if "!borderStyle!"=="5" set flag=1& set borderStyle=···├┼┤···
-	if "!borderStyle!"=="6" set flag=1& set borderStyle=·········
-	if !flag!==0 (call %_errorMsg% %0 "-b=!borderStyle! MUST BE AN INTEGER BETWEEN 1 AND 6")
-    
+    set borderStyleIndex=%_param-b%& set flag=0
+	if !borderStyleIndex! GEQ 1 if !borderStyleIndex! LEQ 6 set flag=1
+	if !flag!==0 (call %_errorMsg% %0 "-b=!borderStyleIndex! MUST BE AN INTEGER BETWEEN 1 AND 6")
+) else (
+    (%_call% ("1 6 borderStyleIndex") %_getRandomNum%)
 )
 if defined _param-a (set alignStyle=%_param-a%)
 if defined _param-l (set linePrefixLen=%_param-l%)
 if defined _param-0 (set dataFile=%_param-0%)
-if not exist "!dataFile!" (call %_errorMsg% %0 "!dataFile! FILE NOT EXIST")
 
+if not exist "!dataFile!" (call %_errorMsg% %0 "!dataFile! FILE NOT EXIST")
+if "!borderStyleIndex!"=="1" set borderStyle=┌┬┐├┼┤└┴┘
+if "!borderStyleIndex!"=="2" set borderStyle=┏┳┓┣╋┫┗┻┛
+if "!borderStyleIndex!"=="3" set borderStyle=╔╦╗╠╬╣╚╩╝
+if "!borderStyleIndex!"=="4" set borderStyle=┼┼┼├┼┤┼┼┼
+if "!borderStyleIndex!"=="5" set borderStyle=···├┼┤···
+if "!borderStyleIndex!"=="6" set borderStyle=·········
 
 ::========================= read data =========================
 set vIndex=1
